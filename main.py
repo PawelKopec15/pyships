@@ -5,6 +5,7 @@ from animated_sprite import AnimatedSprite
 GLOBAL_SCALE = 4
 
 tile_water = AnimatedSprite("assets\\tileset.png", pygame.Rect(32, 0, 16, 16), 8, 5 )
+tile_missed_bullet = AnimatedSprite("assets\\tileset.png", pygame.Rect(64, 48, 16, 16), 2, 1 )
 ui_grid = AnimatedSprite("assets\\tileset.png", pygame.Rect(0, 0, 16, 16), 2, 1 )
 effect_splash = AnimatedSprite("assets\\tileset.png", pygame.Rect(64, 64, 16, 16), 6, 6 )
 
@@ -44,19 +45,22 @@ while True:
             pygame.quit()
             sys.exit()
     
-    delta = clock.tick(144)
-    print(delta)
+    delta = clock.tick(60)
 
     # Clear the screen
-    screen.fill((255, 255, 255))
+    screen.fill((0, 0, 0))
 
     # Updating all animated sprites
     tile_water.tick(delta)
+    tile_missed_bullet.tick(delta)
     ui_grid.tick(delta)
     effect_splash.tick(delta)
     
     draw_water((10, 10), (11, 9))
-    draw_grid((10, 10), (11, 9))
+    
+    draw_scaled(tile_missed_bullet.get_sprite_sheet(), (26, 26), tile_missed_bullet.get_frame_rect())
+    
+    #draw_grid((10, 10), (11, 9))
 
     # Update the display
     pygame.display.flip()
