@@ -1,13 +1,14 @@
 import pygame
 
+TILESET_PATH = "assets\\tileset.png"
 class AnimatedSprite:
     
-    def __init__(self, image_path, first_frame_rect, num_of_frames, frames_per_second):
+    def __init__(self, image_path, first_frame_rect, num_of_frames, millis_per_frame):
         self.sprite_sheet = pygame.image.load(image_path)
         self.frame_rect = first_frame_rect
         self.first_frame_x = first_frame_rect.left
         self.num_of_frames = num_of_frames
-        self.fps = frames_per_second
+        self.fps = millis_per_frame
         self.frame = 0
         self.timer = 0
         self.looped_once = False
@@ -16,7 +17,7 @@ class AnimatedSprite:
         
         self.timer += delta
         
-        time_per_frame = 1000 // self.fps
+        time_per_frame = 1000000 // self.fps
         if self.timer // time_per_frame > self.frame:
             
             self.frame += 1
