@@ -1,0 +1,32 @@
+import pygame
+
+class AnimatedSprite:
+    
+    def __init__(self, image_path, first_frame_rect, num_of_frames, frames_per_second):
+        self.sprite_sheet = pygame.image.load(image_path)
+        self.frame_rect = first_frame_rect
+        self.first_frame_x = first_frame_rect.left
+        self.num_of_frames = num_of_frames
+        self.fps = frames_per_second
+        self.frame = 0
+        self.timer = 0
+        
+    def tick(self, delta):
+        
+        self.timer += delta
+        
+        time_per_frame = 1000 // self.fps
+        if self.timer // time_per_frame > self.frame:
+            
+            self.frame += 1
+            if(self.frame >= self.num_of_frames):
+                self.frame = 0
+                self.timer -= time_per_frame * self.num_of_frames
+        
+        self.frame_rect.x = self.frame * self.frame_rect.width + self.first_frame_x
+        
+    def get_sprite_sheet(self):
+        return self.sprite_sheet
+    
+    def get_frame_rect(self):
+        return self.frame_rect
