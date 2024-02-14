@@ -6,6 +6,7 @@ from animated_sprite import AnimatedSprite
 from animated_sprite import TILESET_PATH
 
 from draw_wizard import draw_scaled
+from draw_wizard import TILE_SIZE
 
 class BSOrientation(IntEnum):
     RIGHT = 0
@@ -21,8 +22,6 @@ class BSPartType(IntEnum):
 class BSPart(NamedTuple):
     part: BSPartType
     burning: bool
-
-TILE_SIZE = 16
 
 class BattleShip:
     
@@ -95,6 +94,23 @@ class BattleShip:
         if(self.orientation == BSOrientation.DOWN or BSOrientation.UP):
             return (TILE_SIZE, TILE_SIZE*self.size)
         return(TILE_SIZE*self.size, TILE_SIZE)
+    
+    def get_all_coords(self, pos):
+        coords = []
+        current_pos = pos
+        
+        for _ in range(self.size):
+            coords.append(current_pos)
+            if(self.orientation == BSOrientation.RIGHT):
+                current_pos = (current_pos[0] + 1, current_pos[1])
+            elif(self.orientation == BSOrientation.UP):
+                current_pos = (current_pos[0], current_pos[1] - 1)
+            elif(self.orientation == BSOrientation.LEFT):
+                current_pos = (current_pos[0] - 1, current_pos[1])
+            elif(self.orientation == BSOrientation.DOWN):
+                current_pos = (current_pos[0], current_pos[1] + 1)
+        
+        return coords
         
     def draw_self(self, screen, pos):
         
