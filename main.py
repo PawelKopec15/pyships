@@ -1,6 +1,7 @@
 import pygame
 import sys
 import math
+import copy
 from enum import Enum
 
 from draw_wizard import *
@@ -46,6 +47,7 @@ game_state = GameState.TITLE
 game_sub_state = GameSubState.WAITING_FOR_INPUT
 transition_animation_current_y = -screen_height
 transition_animation_current_target = 0
+transition_delay = 0
 
 first_coords_x = 99999
 first_coords_y = 99999
@@ -68,15 +70,21 @@ while True:
                 
                 if game_state == GameState.PLAYER_TURN and game_sub_state == GameSubState.WAITING_FOR_INPUT:
                     if first_coords_x <= mouse_x <= (first_coords_x + board_width*TILE_SIZE) and first_coords_y <= mouse_y <= (first_coords_y + board_height*TILE_SIZE):
-                        board.shoot_at_p2(pos)
+                        if not board.shoot_at_p2(pos):
+                            game_sub_state = GameSubState.TRANSITION_ANIMATION
+                            transition_delay = 1000
+                            transition_animation_current_target = 0
+                            transition_animation_current_y = screen_height
+                
                 elif game_state == GameState.SHIP_SETUP and game_sub_state == GameSubState.WAITING_FOR_INPUT:
-                    if(board.add_ship(1, ship_list[ship_i], pos)):
+                    if(board.add_ship(1, copy.copy(ship_list[ship_i]), pos)):
                         ship_i += 1
                         if(ship_i >= len(ship_list)):
                             ai_place_ships(board, (board_width, board_height), ship_list)
                             game_state = GameState.PLAYER_TURN
                             game_sub_state = GameSubState.TRANSITION_ANIMATION
                             transition_animation_current_target = screen_height
+                            
                 elif game_state == GameState.TITLE:
                     game_state = GameState.SHIP_SETUP
                     game_sub_state = GameSubState.TRANSITION_ANIMATION
@@ -86,7 +94,7 @@ while True:
                 if game_state == GameState.SHIP_SETUP and game_sub_state == GameSubState.WAITING_FOR_INPUT:
                     ship_list[ship_i].rotate_clockwise()
     
-    delta = clock.tick(60)    
+    delta = clock.tick(30)    
 
     # Updating all animated sprites
     update_all_animated_sprites(delta)
@@ -95,7 +103,7 @@ while True:
     # Backgrounds
     draw_scaled(screen, background, (0, 0), pygame.Rect(0, 0, background.get_width(), background.get_height()))
     
-    if game_sub_state != GameSubState.TRANSITION_ANIMATION:
+    if game_sub_state != GameSubState.TRANSITION_ANIMATION or transition_delay>0:
         if game_state == GameState.SHIP_SETUP or  game_state == GameState.ENEMY_TURN:
             first_coords_x, first_coords_y = board.draw_bottom(screen, delta)
         elif game_state == GameState.PLAYER_TURN:
@@ -103,11 +111,20 @@ while True:
     
     # Transition animation
     if game_sub_state == GameSubState.TRANSITION_ANIMATION:
-        board.draw_both_for_animation(screen, transition_animation_current_y)
-        direction = math.copysign(1, transition_animation_current_target-transition_animation_current_y)
-        transition_animation_current_y += delta * direction / 10
-        if(math.copysign(direction, transition_animation_current_target-transition_animation_current_y) < 1):
-            game_sub_state = GameSubState.WAITING_FOR_INPUT
+        if transition_delay > 0:
+            transition_delay -= delta
+            if transition_delay < 0:
+                if game_state == GameState.PLAYER_TURN:
+                    game_state = GameState.ENEMY_TURN
+                else:
+                    game_state = GameState.PLAYER_TURN
+            
+        else:
+            board.draw_both_for_animation(screen, transition_animation_current_y)
+            direction = math.copysign(1, transition_animation_current_target-transition_animation_current_y)
+            transition_animation_current_y += delta * direction / 8
+            if(math.copysign(1, transition_animation_current_target-transition_animation_current_y) != direction):
+                game_sub_state = GameSubState.WAITING_FOR_INPUT
         
     # Ship in hand
     if game_state == GameState.SHIP_SETUP and game_sub_state == GameSubState.WAITING_FOR_INPUT:
@@ -124,6 +141,8 @@ while True:
         text_rect.center = (screen_width*GLOBAL_SCALE // 2, screen_height*GLOBAL_SCALE // 2)
 
         screen.blit(text, text_rect)
+    
+    # Winning condition
     
     
 
