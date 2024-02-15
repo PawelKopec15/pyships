@@ -14,13 +14,24 @@ board_bottom = pygame.transform.flip(board_top, False, True)
 
 tile_water = AnimatedSprite(TILESET_PATH, pygame.Rect(32, 0, 16, 16), 8, 4500 )
 tile_missed_bullet = AnimatedSprite(TILESET_PATH, pygame.Rect(0, 80, 16, 16), 2, 800 )
+
+tile_sonar = AnimatedSprite(TILESET_PATH, pygame.Rect(0, 96, 16, 16), 7, 4300 )
+tile_pin_white = AnimatedSprite(TILESET_PATH, pygame.Rect(0, 112, 16, 16), 7, 4300 )
+tile_pin_red = AnimatedSprite(TILESET_PATH, pygame.Rect(0, 128, 16, 16), 7, 4300 )
+tile_pin_glowing = AnimatedSprite(TILESET_PATH, pygame.Rect(0, 144, 16, 16), 7, 4300 )
+
 ui_grid = AnimatedSprite(TILESET_PATH, pygame.Rect(0, 0, 16, 16), 2, 1000 )
+
 effect_splash = AnimatedSprite(TILESET_PATH, pygame.Rect(64, 64, 16, 16), 5, 6000 )
 effect_explosion = AnimatedSprite(TILESET_PATH, pygame.Rect(64, 80, 16, 16), 5, 10000 )
 
 def update_all_animated_sprites(delta):
     tile_water.tick(delta)
     tile_missed_bullet.tick(delta)
+    tile_sonar.tick(delta)
+    tile_pin_white.tick(delta)
+    tile_pin_red.tick(delta)
+    tile_pin_glowing.tick(delta)
     ui_grid.tick(delta)
     effect_splash.tick(delta)
     effect_explosion.tick(delta)
@@ -42,16 +53,53 @@ def draw_water(screen, tile_water, pos, size):
     for y in range(size[1]):
         for x in range(size[0]):
             draw_scaled(screen, tile_water.get_sprite_sheet(), (x*water_width+pos[0], y*water_height+pos[1]), tile_water.get_frame_rect())
-            
-def draw_board_top():
-    pass
 
-def draw_board_bottom_only(screen, y):
-    draw_scaled(screen, board_bottom, (BOARD_X_OFFSET, y), pygame.Rect(0, 0, board_bottom.get_width(), board_bottom.get_height()))
-            
-def draw_board_bottom(screen, y, board_size, p1_board, p1_ships, delta ):
+def draw_board_top_only(screen, y, board_size):
+    draw_scaled(screen, board_top, (BOARD_X_OFFSET, y), pygame.Rect(0, 0, board_top.get_width(), board_top.get_height()))
     
-    draw_board_bottom_only(screen, 0)
+    BACKGROUND_COLOR = (99, 199, 77)
+    background_x = max ( board_top.get_width()//5*2 - (board_size[0]*TILE_SIZE//2), BOARD_X_OFFSET+BOARD_MARGIN )
+    background_y = board_top.get_height()//2 - (board_size[1]*TILE_SIZE//2 + BOARD_MARGIN)
+    background_width = board_size[0]*TILE_SIZE+2
+    background_height = board_size[1]*TILE_SIZE+2
+    
+    background_surface = pygame.Surface((background_width, background_height))
+    background_surface.fill(BACKGROUND_COLOR)
+    
+    screen.blit(pygame.transform.scale(background_surface, (background_width*GLOBAL_SCALE,background_height*GLOBAL_SCALE)), (background_x*GLOBAL_SCALE, background_y*GLOBAL_SCALE))
+    
+    return background_x+1, background_y+1
+ 
+def draw_board_top(screen, board_size, p2_board, p2_ships):
+    
+    first_coord_x, first_coord_y = draw_board_top_only(screen, 0, board_size)
+    
+    for ship in p2_ships:
+        coords = ship[1].get_all_coords(ship[0])
+        for i in range( len(coords) ):
+            if ship[1].is_segment_on_fire(i):
+                if ship[1].wrecked():
+                    draw_scaled(screen, tile_pin_red.get_sprite_sheet(), (first_coord_x+TILE_SIZE*coords[i][0], first_coord_y+TILE_SIZE*coords[i][1]), tile_pin_red.get_frame_rect())
+                else:
+                    draw_scaled(screen, tile_pin_glowing.get_sprite_sheet(), (first_coord_x+TILE_SIZE*coords[i][0], first_coord_y+TILE_SIZE*coords[i][1]), tile_pin_glowing.get_frame_rect())
+            else:
+                draw_scaled(screen, tile_sonar.get_sprite_sheet(), (first_coord_x+TILE_SIZE*coords[i][0], first_coord_y+TILE_SIZE*coords[i][1]), tile_sonar.get_frame_rect())
+    
+    for y in range( board_size[1] ):
+        for x in range( board_size[0] ):
+            current_pos = (first_coord_x+TILE_SIZE*x, first_coord_y+TILE_SIZE*y)
+            
+            if(p2_board[y][x] == None):
+                draw_scaled(screen, tile_sonar.get_sprite_sheet(), current_pos, tile_sonar.get_frame_rect())
+            elif(p2_board[y][x] == -1):
+                draw_scaled(screen, tile_pin_white.get_sprite_sheet(), current_pos, tile_pin_white.get_frame_rect())
+                
+            draw_scaled(screen, ui_grid.get_sprite_sheet(), current_pos, ui_grid.get_frame_rect())
+            
+    return first_coord_x, first_coord_y
+
+def draw_board_bottom_only(screen, y, board_size):
+    draw_scaled(screen, board_bottom, (BOARD_X_OFFSET, y), pygame.Rect(0, 0, board_bottom.get_width(), board_bottom.get_height()))
     
     BACKGROUND_COLOR = (192, 203, 220)
     background_x = max ( board_bottom.get_width()//5*2 - (board_size[0]*TILE_SIZE//2), BOARD_X_OFFSET+BOARD_MARGIN )
@@ -64,8 +112,11 @@ def draw_board_bottom(screen, y, board_size, p1_board, p1_ships, delta ):
     
     screen.blit(pygame.transform.scale(background_surface, (background_width*GLOBAL_SCALE,background_height*GLOBAL_SCALE)), (background_x*GLOBAL_SCALE, background_y*GLOBAL_SCALE))
     
-    first_coord_x = background_x+1
-    first_coord_y = background_y+1
+    return background_x+1, background_y+1
+            
+def draw_board_bottom(screen, board_size, p1_board, p1_ships, delta):
+    
+    first_coord_x, first_coord_y = draw_board_bottom_only(screen, 0, board_size)
     
     for ship in p1_ships:
         ship[1].tick(delta)

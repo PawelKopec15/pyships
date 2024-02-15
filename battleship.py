@@ -77,6 +77,12 @@ class BattleShip:
     
         self.parts[segment] = BSPart(self.parts[segment].part, val)
         
+    def is_segment_on_fire(self, segment):
+        if segment > self.size:
+            return False
+        
+        return self.parts[segment].burning
+        
     def get_indexes_of_segments_on_fire(self):
         to_ret = []
         for i in range(self.size):

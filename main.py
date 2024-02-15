@@ -28,7 +28,7 @@ clock = pygame.time.Clock()
 board_width = 11
 board_height = 9
 board = Board((board_width, board_height))
-board.add_ship(1, BattleShip(4), (2, 4))
+board.add_ship(2, BattleShip(3), (3, 3))
 
 first_coords_x = 99999
 first_coords_y = 99999
@@ -48,7 +48,7 @@ while True:
             if event.button == 1:  # Left mouse button
                 if first_coords_x <= mouse_x <= (first_coords_x + board_width*TILE_SIZE) and first_coords_y <= mouse_y <= (first_coords_y + board_height*TILE_SIZE):
                     pos = math.floor((mouse_x-first_coords_x)/TILE_SIZE), math.floor((mouse_y-first_coords_y)/TILE_SIZE)
-                    board.shoot_at_p1(pos)
+                    board.shoot_at_p2(pos)
                     
             elif event.button == 3:  # Right mouse button
                 pass
@@ -56,13 +56,13 @@ while True:
     delta = clock.tick(60)
 
     # Clear the screen
-    # screen.fill((0, 0, 0))
     draw_scaled(screen, background, (0, 0), pygame.Rect(0, 0, background.get_width(), background.get_height()))
 
     # Updating all animated sprites
     update_all_animated_sprites(delta)
     
-    first_coords_x, first_coords_y = board.draw_bottom(screen, delta)
+    # first_coords_x, first_coords_y = board.draw_bottom(screen, delta)
+    first_coords_x, first_coords_y = board.draw_top(screen)
 
     # Update the display
     pygame.display.flip()

@@ -16,15 +16,20 @@ class Board:
         self.p2_ships = []
         self.p2_board = []
         
-        for y in range(size[1]):
+        for _ in range(size[1]):
             row = []
-            for x in range(size[0]):
+            row2 = []
+            for _ in range(size[0]):
                 row.append(None)
+                row2.append(None)
             self.p1_board.append(row)
-            self.p2_board.append(row)
+            self.p2_board.append(row2)
     
     def draw_bottom(self, screen, delta):
-        return draw_board_bottom(screen, 0, self.size, self.p1_board, self.p1_ships, delta)
+        return draw_board_bottom(screen, self.size, self.p1_board, self.p1_ships, delta)
+    
+    def draw_top(self, screen):
+        return draw_board_top(screen, self.size, self.p2_board, self.p2_ships)
     
     def add_ship(self, player, ship, pos):
         coords = ship.get_all_coords(pos)
@@ -48,3 +53,13 @@ class Board:
             for i in range(len(coords)):
                 if coords[i] == pos:
                     self.p1_ships[val][1].set_segment_on_fire(i, True)
+                    
+    def shoot_at_p2(self, pos):
+        val = self.p2_board[pos[1]][pos[0]]
+        if val == None:
+            self.p2_board[pos[1]][pos[0]] = -1
+        elif val >= 0:
+            coords = self.p2_ships[val][1].get_all_coords( self.p2_ships[val][0] )
+            for i in range(len(coords)):
+                if coords[i] == pos:
+                    self.p2_ships[val][1].set_segment_on_fire(i, True)
