@@ -1,5 +1,8 @@
 ## PyShips
-#### A battleships clone written in PyGame
+A battleships clone written in PyGame
+
+### GitHub link:
+https://github.com/PawelKopec15/pyships
 
 ### Controls:
 Right mouse button - rotate ship <br> Left mouse button - everyting else
