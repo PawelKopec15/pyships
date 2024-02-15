@@ -26,6 +26,26 @@ class GameState(Enum):
 class GameSubState(Enum):
     TRANSITION_ANIMATION = 0
     WAITING_FOR_INPUT = 1
+    
+def check_winning_condition(board):
+    if(board.check_winner_p1()):
+        text = font.render("You win!!!", True, (255, 255, 255))
+        text_rect = text.get_rect()
+        text_rect.center = (screen_width*GLOBAL_SCALE // 2, screen_height*GLOBAL_SCALE // 2)
+
+        screen.blit(text, text_rect)
+        pygame.display.flip()
+        time.sleep(2)
+        sys.exit(0)
+    elif(board.check_winner_p2()):
+        text = font.render("You lose :(.", True, (255, 255, 255))
+        text_rect = text.get_rect()
+        text_rect.center = (screen_width*GLOBAL_SCALE // 2, screen_height*GLOBAL_SCALE // 2)
+
+        screen.blit(text, text_rect)
+        pygame.display.flip()
+        time.sleep(2)
+        sys.exit(0)
 
 background = pygame.image.load("assets/background2.png")
 
@@ -42,6 +62,7 @@ board_height = 9
 board = Board((board_width, board_height))
 
 ship_list = [ BattleShip(4), BattleShip(3), BattleShip(3), BattleShip(2), BattleShip(2) ]
+enemy_ship_list = [ BattleShip(4), BattleShip(3), BattleShip(3), BattleShip(2), BattleShip(2) ]
 ship_i = 0
 
 game_state = GameState.TITLE
@@ -85,7 +106,7 @@ while True:
                     if(board.add_ship(1, copy.copy(ship_list[ship_i]), pos)):
                         ship_i += 1
                         if(ship_i >= len(ship_list)):
-                            ai_place_ships(board, (board_width, board_height), ship_list)
+                            ai_place_ships(board, (board_width, board_height), enemy_ship_list)
                             game_state = GameState.PLAYER_TURN
                             game_sub_state = GameSubState.TRANSITION_ANIMATION
                             transition_animation_current_target = screen_height
@@ -121,6 +142,7 @@ while True:
             transition_delay -= delta
             
             if transition_delay < 0:
+                check_winning_condition(board)
                 if game_state == GameState.PLAYER_TURN:
                     game_state = GameState.ENEMY_TURN
                     enemy_chances = 2
@@ -166,6 +188,7 @@ while True:
                 transition_delay = 1000
                 transition_animation_current_target = screen_height
                 transition_animation_current_y = 0
+                enemy_rocket_y = -32
             
         elif enemy_rocket_dest[1]*TILE_SIZE+first_coords_x < enemy_rocket_y < screen_height:
             if board.shoot_at_p1(enemy_rocket_dest):
@@ -174,27 +197,6 @@ while True:
             
         enemy_rocket_y += delta / 8
         draw_scaled(screen, effect_bomb.get_sprite_sheet(), (enemy_rocket_dest[0]*TILE_SIZE + first_coords_x, enemy_rocket_y), effect_bomb.get_frame_rect())
-    
-    # Winning condition
-    if game_state != GameState.TITLE and game_state != GameState.SHIP_SETUP:
-        if(board.check_winner_p1()):
-            text = font.render("You win!!!", True, (255, 255, 255))
-            text_rect = text.get_rect()
-            text_rect.center = (screen_width*GLOBAL_SCALE // 2, screen_height*GLOBAL_SCALE // 2)
-
-            screen.blit(text, text_rect)
-            pygame.display.flip()
-            time.sleep(2)
-            sys.exit(0)
-        elif(board.check_winner_p2()):
-            text = font.render("You lose :(.", True, (255, 255, 255))
-            text_rect = text.get_rect()
-            text_rect.center = (screen_width*GLOBAL_SCALE // 2, screen_height*GLOBAL_SCALE // 2)
-
-            screen.blit(text, text_rect)
-            pygame.display.flip()
-            time.sleep(2)
-            sys.exit(0)
     
 
     # Update the display

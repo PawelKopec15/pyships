@@ -104,8 +104,6 @@ def draw_board_top(screen, board_size, p2_board, p2_ships):
                 draw_scaled(screen, tile_sonar.get_sprite_sheet(), current_pos, tile_sonar.get_frame_rect())
             elif(p2_board[y][x] == -1):
                 draw_scaled(screen, tile_pin_white.get_sprite_sheet(), current_pos, tile_pin_white.get_frame_rect())
-                
-            draw_scaled(screen, ui_grid.get_sprite_sheet(), current_pos, ui_grid.get_frame_rect())
             
     return first_coord_x, first_coord_y
 
@@ -140,8 +138,6 @@ def draw_board_bottom(screen, board_size, p1_board, p1_ships, delta):
                 draw_scaled(screen, tile_water.get_sprite_sheet(), current_pos, tile_water.get_frame_rect())
             elif(p1_board[y][x] == -1):
                 draw_scaled(screen, tile_missed_bullet.get_sprite_sheet(), current_pos, tile_missed_bullet.get_frame_rect())
-                
-            draw_scaled(screen, ui_grid.get_sprite_sheet(), current_pos, ui_grid.get_frame_rect())
             
     return first_coord_x, first_coord_y
 

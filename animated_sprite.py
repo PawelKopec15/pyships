@@ -1,6 +1,6 @@
 import pygame
 
-TILESET_PATH = "assets\\tileset.png"
+TILESET_PATH = "assets\\tileset_gridded.png"
 class AnimatedSprite:
     
     def __init__(self, image_path, first_frame_rect, num_of_frames, millis_per_frame):

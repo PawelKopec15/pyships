@@ -1,5 +1,6 @@
 import pygame
 import random
+import copy
 
 from battleship import BattleShip
 
