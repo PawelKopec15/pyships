@@ -9,6 +9,15 @@ TILE_SIZE = 16
 
 BOARD_X_OFFSET = 10
 BOARD_MARGIN = 5
+
+pygame.init()
+
+# Set up the screen
+screen_width = 300
+screen_height = 180
+screen = pygame.display.set_mode((screen_width * GLOBAL_SCALE, screen_height * GLOBAL_SCALE))
+pygame.display.set_caption("PyShips")
+
 board_top = pygame.image.load("assets/board_top.png")
 board_bottom = pygame.transform.flip(board_top, False, True)
 
@@ -21,6 +30,7 @@ tile_pin_red = AnimatedSprite(TILESET_PATH, pygame.Rect(0, 128, 16, 16), 7, 4300
 tile_pin_glowing = AnimatedSprite(TILESET_PATH, pygame.Rect(0, 144, 16, 16), 7, 4300 )
 
 ui_grid = AnimatedSprite(TILESET_PATH, pygame.Rect(0, 0, 16, 16), 2, 1000 )
+ui_pin = AnimatedSprite(TILESET_PATH, pygame.Rect(48, 64, 16, 32), 1 , 1000)
 
 effect_splash = AnimatedSprite(TILESET_PATH, pygame.Rect(64, 64, 16, 16), 5, 6000 )
 effect_explosion = AnimatedSprite(TILESET_PATH, pygame.Rect(64, 80, 16, 16), 5, 10000 )
@@ -54,17 +64,16 @@ def draw_water(screen, tile_water, pos, size):
         for x in range(size[0]):
             draw_scaled(screen, tile_water.get_sprite_sheet(), (x*water_width+pos[0], y*water_height+pos[1]), tile_water.get_frame_rect())
 
-def draw_board_top_only(screen, y, board_size):
+def draw_board_top_only(screen, y, board_size, color):
     draw_scaled(screen, board_top, (BOARD_X_OFFSET, y), pygame.Rect(0, 0, board_top.get_width(), board_top.get_height()))
     
-    BACKGROUND_COLOR = (99, 199, 77)
     background_x = max ( board_top.get_width()//5*2 - (board_size[0]*TILE_SIZE//2), BOARD_X_OFFSET+BOARD_MARGIN )
     background_y = board_top.get_height()//2 - (board_size[1]*TILE_SIZE//2 + BOARD_MARGIN)
     background_width = board_size[0]*TILE_SIZE+2
     background_height = board_size[1]*TILE_SIZE+2
     
     background_surface = pygame.Surface((background_width, background_height))
-    background_surface.fill(BACKGROUND_COLOR)
+    background_surface.fill(color)
     
     screen.blit(pygame.transform.scale(background_surface, (background_width*GLOBAL_SCALE,background_height*GLOBAL_SCALE)), (background_x*GLOBAL_SCALE, background_y*GLOBAL_SCALE))
     
@@ -72,7 +81,7 @@ def draw_board_top_only(screen, y, board_size):
  
 def draw_board_top(screen, board_size, p2_board, p2_ships):
     
-    first_coord_x, first_coord_y = draw_board_top_only(screen, 0, board_size)
+    first_coord_x, first_coord_y = draw_board_top_only(screen, 0, board_size, (99, 199, 77))
     
     for ship in p2_ships:
         coords = ship[1].get_all_coords(ship[0])
@@ -98,17 +107,16 @@ def draw_board_top(screen, board_size, p2_board, p2_ships):
             
     return first_coord_x, first_coord_y
 
-def draw_board_bottom_only(screen, y, board_size):
+def draw_board_bottom_only(screen, y, board_size, color):
     draw_scaled(screen, board_bottom, (BOARD_X_OFFSET, y), pygame.Rect(0, 0, board_bottom.get_width(), board_bottom.get_height()))
     
-    BACKGROUND_COLOR = (192, 203, 220)
     background_x = max ( board_bottom.get_width()//5*2 - (board_size[0]*TILE_SIZE//2), BOARD_X_OFFSET+BOARD_MARGIN )
     background_y = board_bottom.get_height()//2 - (board_size[1]*TILE_SIZE//2 - BOARD_MARGIN)
     background_width = board_size[0]*TILE_SIZE+2
     background_height = board_size[1]*TILE_SIZE+2
     
     background_surface = pygame.Surface((background_width, background_height))
-    background_surface.fill(BACKGROUND_COLOR)
+    background_surface.fill(color)
     
     screen.blit(pygame.transform.scale(background_surface, (background_width*GLOBAL_SCALE,background_height*GLOBAL_SCALE)), (background_x*GLOBAL_SCALE, background_y*GLOBAL_SCALE))
     
@@ -116,7 +124,7 @@ def draw_board_bottom_only(screen, y, board_size):
             
 def draw_board_bottom(screen, board_size, p1_board, p1_ships, delta):
     
-    first_coord_x, first_coord_y = draw_board_bottom_only(screen, 0, board_size)
+    first_coord_x, first_coord_y = draw_board_bottom_only(screen, 0, board_size, (192, 203, 220))
     
     for ship in p1_ships:
         ship[1].tick(delta)
@@ -134,3 +142,7 @@ def draw_board_bottom(screen, board_size, p1_board, p1_ships, delta):
             draw_scaled(screen, ui_grid.get_sprite_sheet(), current_pos, ui_grid.get_frame_rect())
             
     return first_coord_x, first_coord_y
+
+def draw_both_boards_only(screen, y, board_size):
+    draw_board_top_only(screen, y-board_bottom.get_size()[1], board_size, (62, 137, 72))
+    draw_board_bottom_only(screen, y, board_size, (0, 149, 233))

@@ -4,7 +4,7 @@ TILESET_PATH = "assets\\tileset.png"
 class AnimatedSprite:
     
     def __init__(self, image_path, first_frame_rect, num_of_frames, millis_per_frame):
-        self.sprite_sheet = pygame.image.load(image_path)
+        self.sprite_sheet = pygame.image.load(image_path).convert_alpha()
         self.frame_rect = first_frame_rect
         self.first_frame_x = first_frame_rect.left
         self.num_of_frames = num_of_frames

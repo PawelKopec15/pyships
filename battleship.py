@@ -71,6 +71,10 @@ class BattleShip:
     def set_orientation(self, val):
         self.orientation = val
         
+    def rotate_clockwise(self):
+        self.orientation += 1
+        self.orientation %= 4
+        
     def set_segment_on_fire(self, segment, val):
         if segment > self.size:
             return
