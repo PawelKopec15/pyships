@@ -34,7 +34,19 @@ class Board:
     
     def draw_both_for_animation(self, screen, y):
         draw_both_boards_only(screen, y, self.size)
+        
+    def check_winner_p1(self):
+        for ship in self.p2_ships:
+            if not ship[1].wrecked():
+                return False
+        return True
     
+    def check_winner_p2(self):
+        for ship in self.p1_ships:
+            if not ship[1].wrecked():
+                return False
+        return True
+            
     def add_ship(self, player, ship, pos):
         coords = ship.get_all_coords(pos)
         for coord in coords:

@@ -2,6 +2,7 @@ import pygame
 import sys
 import math
 import copy
+import time
 from enum import Enum
 
 from draw_wizard import *
@@ -32,7 +33,7 @@ clock = pygame.time.Clock()
 
 # Load the font
 font_path = "assets/c64esque.ttf"
-font_size = 36
+font_size = 56
 font = pygame.font.Font(font_path, font_size)
 
 # Gameplay setup
@@ -48,6 +49,10 @@ game_sub_state = GameSubState.WAITING_FOR_INPUT
 transition_animation_current_y = -screen_height
 transition_animation_current_target = 0
 transition_delay = 0
+
+enemy_rocket_y = -16
+enemy_rocket_dest = (0, 0)
+enemy_chances = 2
 
 first_coords_x = 99999
 first_coords_y = 99999
@@ -98,6 +103,7 @@ while True:
 
     # Updating all animated sprites
     update_all_animated_sprites(delta)
+           
     
     ## DRAWING
     # Backgrounds
@@ -113,9 +119,12 @@ while True:
     if game_sub_state == GameSubState.TRANSITION_ANIMATION:
         if transition_delay > 0:
             transition_delay -= delta
+            
             if transition_delay < 0:
                 if game_state == GameState.PLAYER_TURN:
                     game_state = GameState.ENEMY_TURN
+                    enemy_chances = 2
+                    enemy_rocket_y = -16
                 else:
                     game_state = GameState.PLAYER_TURN
             
@@ -142,8 +151,50 @@ while True:
 
         screen.blit(text, text_rect)
     
-    # Winning condition
+    ## Enemy turn
+    if game_state == GameState.ENEMY_TURN and game_sub_state == GameSubState.WAITING_FOR_INPUT:
+        
+        if enemy_rocket_y > screen_height * 2:
+            enemy_rocket_y = -16
+        
+        if enemy_rocket_y == -16:
+            if enemy_chances > 0:
+                enemy_rocket_dest = ai_take_a_shot(board)
+                enemy_chances -= 1
+            else:
+                game_sub_state = GameSubState.TRANSITION_ANIMATION
+                transition_delay = 1000
+                transition_animation_current_target = screen_height
+                transition_animation_current_y = 0
+            
+        elif enemy_rocket_dest[1]*TILE_SIZE+first_coords_x < enemy_rocket_y < screen_height:
+            if board.shoot_at_p1(enemy_rocket_dest):
+                enemy_chances += 1
+            enemy_rocket_y = screen_height+16        
+            
+        enemy_rocket_y += delta / 8
+        draw_scaled(screen, effect_bomb.get_sprite_sheet(), (enemy_rocket_dest[0]*TILE_SIZE + first_coords_x, enemy_rocket_y), effect_bomb.get_frame_rect())
     
+    # Winning condition
+    if game_state != GameState.TITLE and game_state != GameState.SHIP_SETUP:
+        if(board.check_winner_p1()):
+            text = font.render("You win!!!", True, (255, 255, 255))
+            text_rect = text.get_rect()
+            text_rect.center = (screen_width*GLOBAL_SCALE // 2, screen_height*GLOBAL_SCALE // 2)
+
+            screen.blit(text, text_rect)
+            pygame.display.flip()
+            time.sleep(2)
+            sys.exit(0)
+        elif(board.check_winner_p2()):
+            text = font.render("You lose :(.", True, (255, 255, 255))
+            text_rect = text.get_rect()
+            text_rect.center = (screen_width*GLOBAL_SCALE // 2, screen_height*GLOBAL_SCALE // 2)
+
+            screen.blit(text, text_rect)
+            pygame.display.flip()
+            time.sleep(2)
+            sys.exit(0)
     
 
     # Update the display
