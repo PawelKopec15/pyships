@@ -18,7 +18,7 @@ screen_height = 180
 screen = pygame.display.set_mode((screen_width * GLOBAL_SCALE, screen_height * GLOBAL_SCALE))
 pygame.display.set_caption("PyShips")
 
-board_top = pygame.image.load("assets/board_top.png")
+board_top = pygame.image.load("assets/board_top.png").convert_alpha()
 board_bottom = pygame.transform.flip(board_top, False, True)
 
 tile_water = AnimatedSprite(TILESET_PATH, pygame.Rect(32, 0, 16, 16), 8, 4500 )
@@ -68,7 +68,7 @@ def draw_board_top_only(screen, y, board_size, color):
     draw_scaled(screen, board_top, (BOARD_X_OFFSET, y), pygame.Rect(0, 0, board_top.get_width(), board_top.get_height()))
     
     background_x = max ( board_top.get_width()//5*2 - (board_size[0]*TILE_SIZE//2), BOARD_X_OFFSET+BOARD_MARGIN )
-    background_y = board_top.get_height()//2 - (board_size[1]*TILE_SIZE//2 + BOARD_MARGIN)
+    background_y = board_top.get_height()//2 - (board_size[1]*TILE_SIZE//2 + BOARD_MARGIN) + y
     background_width = board_size[0]*TILE_SIZE+2
     background_height = board_size[1]*TILE_SIZE+2
     
@@ -111,7 +111,7 @@ def draw_board_bottom_only(screen, y, board_size, color):
     draw_scaled(screen, board_bottom, (BOARD_X_OFFSET, y), pygame.Rect(0, 0, board_bottom.get_width(), board_bottom.get_height()))
     
     background_x = max ( board_bottom.get_width()//5*2 - (board_size[0]*TILE_SIZE//2), BOARD_X_OFFSET+BOARD_MARGIN )
-    background_y = board_bottom.get_height()//2 - (board_size[1]*TILE_SIZE//2 - BOARD_MARGIN)
+    background_y = board_bottom.get_height()//2 - (board_size[1]*TILE_SIZE//2 - BOARD_MARGIN) + y
     background_width = board_size[0]*TILE_SIZE+2
     background_height = board_size[1]*TILE_SIZE+2
     
@@ -145,4 +145,4 @@ def draw_board_bottom(screen, board_size, p1_board, p1_ships, delta):
 
 def draw_both_boards_only(screen, y, board_size):
     draw_board_top_only(screen, y-board_bottom.get_size()[1], board_size, (62, 137, 72))
-    draw_board_bottom_only(screen, y, board_size, (0, 149, 233))
+    draw_board_bottom_only(screen, y, board_size, (44, 232, 245))

@@ -32,7 +32,7 @@ class Board:
     def draw_top(self, screen):
         return draw_board_top(screen, self.size, self.p2_board, self.p2_ships)
     
-    def draw_both_for_animaiton(self, screen, y):
+    def draw_both_for_animation(self, screen, y):
         draw_both_boards_only(screen, y, self.size)
     
     def add_ship(self, player, ship, pos):
