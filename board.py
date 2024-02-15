@@ -38,7 +38,7 @@ class Board:
     def add_ship(self, player, ship, pos):
         coords = ship.get_all_coords(pos)
         for coord in coords:
-            if coord[0] < 0 or coord[0] > self.size[0] or coord[1] < 0 or coord[1] > self.size[1]:
+            if coord[0] < 0 or coord[0] >= self.size[0] or coord[1] < 0 or coord[1] >= self.size[1]:
                 return False
         
         adjacent_coords = []

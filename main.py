@@ -4,6 +4,7 @@ import math
 from enum import Enum
 
 from draw_wizard import *
+from enemy_ai import *
 
 from animated_sprite import AnimatedSprite
 from animated_sprite import TILESET_PATH
@@ -72,6 +73,7 @@ while True:
                     if(board.add_ship(1, ship_list[ship_i], pos)):
                         ship_i += 1
                         if(ship_i >= len(ship_list)):
+                            ai_place_ships(board, (board_width, board_height), ship_list)
                             game_state = GameState.PLAYER_TURN
                             game_sub_state = GameSubState.TRANSITION_ANIMATION
                             transition_animation_current_target = screen_height
