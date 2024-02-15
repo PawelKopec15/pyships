@@ -94,22 +94,22 @@ class Board:
         val = self.p1_board[pos[1]][pos[0]]
         if val == None:
             self.p1_board[pos[1]][pos[0]] = -1
-            return False
         elif val >= 0:
             coords = self.p1_ships[val][1].get_all_coords( self.p1_ships[val][0] )
             for i in range(len(coords)):
                 if coords[i] == pos:
                     self.p1_ships[val][1].set_segment_on_fire(i, True)
-        return True
+            return True
+        return False
                     
     def shoot_at_p2(self, pos):
         val = self.p2_board[pos[1]][pos[0]]
         if val == None:
             self.p2_board[pos[1]][pos[0]] = -1
-            return False
         elif val >= 0:
             coords = self.p2_ships[val][1].get_all_coords( self.p2_ships[val][0] )
             for i in range(len(coords)):
                 if coords[i] == pos:
                     self.p2_ships[val][1].set_segment_on_fire(i, True)
-        return True
+            return True
+        return False

@@ -71,7 +71,7 @@ transition_animation_current_y = -screen_height
 transition_animation_current_target = 0
 transition_delay = 0
 
-enemy_rocket_y = -16
+enemy_rocket_y = -32
 enemy_rocket_dest = (0, 0)
 enemy_chances = 2
 
@@ -146,7 +146,7 @@ while True:
                 if game_state == GameState.PLAYER_TURN:
                     game_state = GameState.ENEMY_TURN
                     enemy_chances = 2
-                    enemy_rocket_y = -16
+                    enemy_rocket_y = -32
                 else:
                     game_state = GameState.PLAYER_TURN
             
@@ -177,9 +177,9 @@ while True:
     if game_state == GameState.ENEMY_TURN and game_sub_state == GameSubState.WAITING_FOR_INPUT:
         
         if enemy_rocket_y > screen_height * 2:
-            enemy_rocket_y = -16
+            enemy_rocket_y = -32
         
-        if enemy_rocket_y == -16:
+        if enemy_rocket_y == -32:
             if enemy_chances > 0:
                 enemy_rocket_dest = ai_take_a_shot(board)
                 enemy_chances -= 1
@@ -188,15 +188,15 @@ while True:
                 transition_delay = 1000
                 transition_animation_current_target = screen_height
                 transition_animation_current_y = 0
-                enemy_rocket_y = -32
+                enemy_rocket_y = -48
             
         elif enemy_rocket_dest[1]*TILE_SIZE+first_coords_x < enemy_rocket_y < screen_height:
             if board.shoot_at_p1(enemy_rocket_dest):
                 enemy_chances += 1
             enemy_rocket_y = screen_height+16        
             
-        enemy_rocket_y += delta / 8
-        draw_scaled(screen, effect_bomb.get_sprite_sheet(), (enemy_rocket_dest[0]*TILE_SIZE + first_coords_x, enemy_rocket_y), effect_bomb.get_frame_rect())
+        enemy_rocket_y += delta / 10
+        draw_scaled(screen, effect_bomb.get_sprite_sheet(), (enemy_rocket_dest[0]*TILE_SIZE + first_coords_x, enemy_rocket_y - TILE_SIZE), effect_bomb.get_frame_rect())
     
 
     # Update the display
